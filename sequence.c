@@ -7,20 +7,21 @@
 #include <string.h>
 #include "sequence.h"
 
-const char *CODONTABLE = "FFLLSSSSYY00CC0WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG";
+const char *CODONTABLE = "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG";
 
 static char * ToUpper(char *st);
 
-bool SequenceInit(Sequence ps, char *type) {
-	if (ps->id != NULL) {
-		return false;
-	}
+bool SeqInit(Seq ps, char *type) {
+//	if (ps->id != NULL) {
+//		return false;
+//	}
 
 	type = ToUpper(type);
-	if (strncmp("PROTEIN",type, 7) == 0) {
+	int typelen = strlen(type);
+	if (strncmp("PROTEIN",type, typelen) == 0) {
 		ps->string = (char *) malloc(MAXAA * sizeof(char));
 	}
-	else if (strncmp("DNA", type, 3) == 0 || strncmp("RNA", type, 3) == 0) {
+	else if (strncmp("DNA", type, typelen) == 0 || strncmp("RNA", type, typelen) == 0) {
 		ps->string = (char *) malloc(MAXNT * sizeof(char));
 	}
 	else {
@@ -34,7 +35,7 @@ bool SequenceInit(Sequence ps, char *type) {
 	return true;
 }
 
-bool SequenceFetch(Sequence ps, FILE *fp) {
+bool SeqFetch(Seq ps, FILE *fp) {
 	if (fgetc(fp) != '>') {
 		return false;
 	}
@@ -51,6 +52,10 @@ bool SequenceFetch(Sequence ps, FILE *fp) {
 	}
 	ch = fgetc(fp);
 	for (i = 0; !feof(fp); i++) {
+		if (ch == '\n') {
+			ch = fgetc(fp);
+			continue;
+		}
 		ps->string[i] = ch;
 		ch = fgetc(fp);
 	}
@@ -58,43 +63,43 @@ bool SequenceFetch(Sequence ps, FILE *fp) {
 	return true;
 }
 
-bool Transcribe(Sequence pdna, Sequence prna) {
+bool SeqTranscribe(Seq dna, Seq rna) {
 	char ch;
 
-	if (pdna->type != 'D' || prna->type != 'R') {
+	if (dna->type != 'D' || rna->type != 'R') {
 		return false;
 	}
-	strcpy(prna->id, pdna->id);
-	strcpy(prna->desc, pdna->desc);
-	prna->size = pdna->size;
-	for (int i = 0; i < pdna->size; i++) {
-		ch = pdna->string[i];
+	strcpy(rna->id, dna->id);
+	strcpy(rna->desc, dna->desc);
+	rna->size = dna->size;
+	for (int i = 0; i < dna->size; i++) {
+		ch = dna->string[i];
 		if (ch == 'T') {
-			prna->string[i] = 'U';
+			rna->string[i] = 'U';
 		}
 		else {
-			prna->string[i] = ch;
+			rna->string[i] = ch;
 		}
 	}
 
 	return true;
 }
 
-bool Translate(Sequence prna, Sequence pprt) {
+bool SeqTranslate(Seq rna, Seq prt) {
 	char codon[3];
 	char ch;
 	double value = 0;
 	double m;
 	int prtct = 0;
 
-	if (prna->type != 'R' || pprt->type != 'P') {
+	if (rna->type != 'R' || prt->type != 'P') {
 		return false;
 	}
-	strcpy(pprt->id, prna->id);
-	strcpy(pprt->desc, prna->desc);
-	for (int i = 0; i < prna->size; i++) {
+	strcpy(prt->id, rna->id);
+	strcpy(prt->desc, rna->desc);
+	for (int i = 0; i < rna->size; i++) {
 		for (int cindex = 0; cindex < 3; cindex++) {
-			codon[i] = prna->string[i + cindex];
+			codon[i] = rna->string[i + cindex];
 		}
 		i += 3;
 		for (int cindex = 0; cindex < 3; cindex++) {
@@ -105,9 +110,9 @@ bool Translate(Sequence prna, Sequence pprt) {
 				case 'G':	value += 3 * m; break;
 			}
 		}
-		pprt->string[prtct++] = CODONTABLE[(int)value];
+		prt->string[prtct++] = CODONTABLE[(int)value];
 	}
-	pprt->size = prtct;
+	prt->size = prtct;
 	return true;
 }
 
