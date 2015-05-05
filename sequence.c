@@ -78,10 +78,6 @@ bool Seq_fetch(Seq *ps, FILE *fp) {
 	return true;
 }
 
-
-void Seq_show(Seq *ps) {
-	putchar(ps->type);
-}
 /* transcribes DNA sequence into RNA */
 bool Seq_transcribe(Seq *pdna, Seq *prna) {
 	char ch;
