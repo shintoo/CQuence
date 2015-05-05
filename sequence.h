@@ -7,11 +7,14 @@
 /* change these values as needed */
 #define MAXNT 300                /* Maximum number of nucleotides       */
 #define MAXAA MAXNT/3            /* Maximum number of amino acids       */
-#define MAXST 50                 /* Maximum size for ID and description */
+#define MAXST 100                 /* Maximum size for ID and description */
+
+/* DO NOT CHANGE ANYTHING BEYOND THIS POINT */
 
 struct sequence;
-
 typedef struct sequence Seq;
+
+/*                     functions                               */
 
 /* operation:      Create a new sequence                       */
 /* preconditions:  type is any capitalization of "DNA", "RNA", */
@@ -34,6 +37,14 @@ void Seq_delete(Seq *ps);
 /*                 sequence pointed to by ps                    */
 /*                 returns true if successful, otherwise false  */
 bool Seq_fetch(Seq *ps, FILE *fp);
+
+/* operation:      write a sequence to a file in FASTA format   */
+/* preconditions:  ps points to a sequence that has been        */
+/*                 fetched, transcribed to, or translated to    */
+/* postconditions: file is written with the sequence            */
+/*                 if the file already exists with data in it,  */
+/*                 it is overwritten                            */
+bool Seq_write(Seq *ps, FILE *fp);
 
 /* operation:      Transcribe a sequence of DNA into a sequence */
 /*                 of RNA                                       */

@@ -33,7 +33,7 @@ Seq * Seq_new(char *type) {
 			newSeq->string = (char *) malloc(MAXNT * sizeof(char));
 			break;
 		default:
-			return false;
+			return NULL;
 	}
 	newSeq->id = (char *) malloc(MAXST * sizeof(char));
 	newSeq->desc = (char *) malloc(MAXST * sizeof(char));
@@ -47,32 +47,36 @@ void Seq_delete(Seq *ps) {
 }
 
 /* fetches sequence data from FASTA file */
-bool Seq_fetch(Seq *ps, FILE *fp) {
-	if (fgetc(fp) != '>') {                                       /* file must be FASTA    */
+bool Seq_fetch(Seq *ps, FILE *fasta) {
+	if (fgetc(fasta) != '>') {                                       /* file must be FASTA    */
 		return false;
 	}
 	if (ps->type != 'D' && ps->type != 'R' && ps->type != 'P') {  /* ps must be created    */
 		return false;
 	}
 	int i;
-	char ch = fgetc(fp);
-	for (i = 0; ch != ' '; i++) {                                 /* fetch id              */
+	char ch = fgetc(fasta);
+	for (i = 0; ch != ' ' && ch != '\n' && i < MAXST - 1; i++) {  /* fetch id              */
 		ps->id[i] = ch;
-		ch = fgetc(fp);
+		ch = fgetc(fasta);
 	}
-	ch = fgetc(fp);
-	for (i = 0; ch != '\n'; i++) {                                /* fetch description     */
-		ps->desc[i] = ch;
-		ch = fgetc(fp);
+	ps->id[i] = '\0';
+	if (ch != '\n') {
+		ch = fgetc(fasta);
+		for (i = 0; ch != '\n' && i < MAXST - 1; i++) {  /* fetch id              */
+			ps->desc[i] = ch;
+			ch = fgetc(fasta);
+		}
+		ps->desc[i] = '\0';
 	}
-	ch = fgetc(fp);
-	for (i = 0; !feof(fp); i++) {                                 /* fetch string          */
+	ch = fgetc(fasta);
+	for (i = 0; !feof(fasta); i++) {                                 /* fetch string          */
 		if (ch == '\n') {
-			ch = fgetc(fp);
+			ch = fgetc(fasta);
 			continue;
 		}
 		ps->string[i] = ch;
-		ch = fgetc(fp);
+		ch = fgetc(fasta);
 	}
 	ps->size = i;
 	return true;
@@ -107,16 +111,15 @@ bool Seq_translate(Seq *prna, Seq *pprt) {
 	char ch;
 	double value = 0;
 	double m;
-	int prtct = 0;
 
 	if (prna->type != 'R' || pprt->type != 'P') {
 		return false;
 	}
 	strcpy(pprt->id, prna->id);
 	strcpy(pprt->desc, prna->desc);
-	for (int i = 0; i < prna->size; i++) {
+	for (int i = 0; i < prna->size && i < MAXNT; i++) {
 		for (int cindex = 0; cindex < 3; cindex++) {
-			codon[i] = prna->string[i + cindex];
+			codon[cindex] = prna->string[i + cindex];
 		}
 		i += 3;
 		for (int cindex = 0; cindex < 3; cindex++) {
@@ -127,9 +130,9 @@ bool Seq_translate(Seq *prna, Seq *pprt) {
 				case 'G':	value += 3 * m; break;
 			}
 		}
-		pprt->string[prtct++] = CODONTABLE[(int)value];
+		pprt->string[pprt->size++] = CODONTABLE[(int)value];
+		value = 0;
 	}
-	pprt->size = prtct;
 	return true;
 }
 

@@ -3,7 +3,8 @@ CQuence is a very simple library for handling biological sequences.
 ### Interface
 CQuence interacts with sequences stored in the FASTA file format.  
 
-#### Example
+#### Examples
+##### Simple demonstration
 ```
 #include <stdio.h>
 #include "sequence.h"
