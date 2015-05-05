@@ -50,8 +50,8 @@ void Seq_delete(Seq *ps) {
 bool Seq_fetch(Seq *ps, FILE *fp) {
 	if (fgetc(fp) != '>') {                                       /* file must be FASTA    */
 		return false;
-	} 
-	if (ps->type != 'D' || ps->type != 'R' || ps->type != 'P') {  /* ps must be created    */
+	}
+	if (ps->type != 'D' && ps->type != 'R' && ps->type != 'P') {  /* ps must be created    */
 		return false;
 	}
 	int i;
@@ -78,6 +78,10 @@ bool Seq_fetch(Seq *ps, FILE *fp) {
 	return true;
 }
 
+
+void Seq_show(Seq *ps) {
+	putchar(ps->type);
+}
 /* transcribes DNA sequence into RNA */
 bool Seq_transcribe(Seq *pdna, Seq *prna) {
 	char ch;
