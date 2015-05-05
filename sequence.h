@@ -9,47 +9,50 @@
 #define MAXAA MAXNT/3            /* Maximum number of amino acids       */
 #define MAXST 50                 /* Maximum size for ID and description */
 
+struct sequence;
 
-struct sequence {
-	char *id;
-	char *desc;
-	char *string;
-	char type;
-	int size;
-};
-typedef struct sequence * Seq;
+typedef struct sequence Seq;
 
-/* operation:      Initialize a sequence to the specified type */
-/* preconditions:  sequence is a sequence                      */
-/*                 type is any capitalization of "DNA", "RNA", */
+/* operation:      Create a new sequence                       */
+/* preconditions:  type is any capitalization of "DNA", "RNA", */
 /*                 or "protein"                                */
-/* postconditions: If the type is a valid typle, the sequence  */
-/*                 is initialized and the function returns     */
-/*                 true; otherwise, if the type is not valid,  */
-/*                 the function returns false                  */
-bool SeqInit(Seq sequence, char *type);
+/* postconditions: If the type is a valid typle, the function  */
+/*                 returns the address of the created sequence.*/
+/*                 Otherwise, if the type is not valid, the    */
+/*                 function returns NULL                       */
+Seq * Seq_new(char *type);
+
+/* operation:      delete a sequence from memory                */
+/* precondition:   ps points to a sequence                      */
+/* postconditions: the sequence pointed to by ps is deleted     */
+void Seq_delete(Seq *ps);
 
 /* operation:      Fetch a sequence from a file                 */
-/* preconditions:  sequence is an initialized sequenc           */
+/* preconditions:  ps is the address of a created sequence      */
 /*                 fp points to a FASTA format file             */
 /* postconditions: The sequence in fp is loaded into the        */
-/*                 sequence, returns true                       */
-bool SeqFetch(Seq sequence, FILE *fp);
+/*                 sequence pointed to by ps                    */
+/*                 returns true if successful, otherwise false  */
+bool Seq_fetch(Seq *ps, FILE *fp);
 
 /* operation:      Transcribe a sequence of DNA into a sequence */
 /*                 of RNA                                       */
-/* preconditions:  dna is an initialized sequence of type DNA   */
-/*                 rna is an initialized sequence of type RNA   */
-/* postconditions: dna is transcribed into rna                  */
-bool SeqTranscribe(Seq dna, Seq rna);
+/* preconditions:  pdna points to a sequence of type DNA        */
+/*                 prna points to a sequence of type RNA        */
+/* postconditions: the sequence pointed to by pdna is           */
+/*                 transcribed into rna                         */
+/*                 returns true if sueccessful, otherwise false */
+bool Seq_transcribe(Seq *pdna, Seq *prna);
 
 
 /* operation:      Translate a sequence of RNA into a protein   */
 /*                 sequence                                     */
-/* preconditions:  pdna points to an initialized sequence of    */
-/*                 type DNA                                     */
-/*                 pprt is an iinitialized sequence of type     */
-/*                 PROTEIN                                      */
-bool SeqTranslate(Seq rna, Seq prt);
+/* preconditions:  prna points to a sequence of type RNA        */
+/*                 pprt points to a sequence of type PROTEIN    */
+/* postconditions: the sequence pointed to by prna is           */
+/*                 translated into the sequence pointed to by   */
+/*                 pprt                                         */
+/*                 returns true if successful, otherwise false  */
+bool Seq_translate(Seq *prna, Seq *pprt);
 
 #endif

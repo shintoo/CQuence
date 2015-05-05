@@ -7,51 +7,66 @@
 #include <string.h>
 #include "sequence.h"
 
+struct sequence {
+	char *id;
+	char *desc;
+	char *string;
+	char type;
+	int size;
+};
+
 const char *CODONTABLE = "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG";
 
 static char * ToUpper(char *st);
 
-bool SeqInit(Seq ps, char *type) {
-//	if (ps->id != NULL) {
-//		return false;
-//	}
-
-	type = ToUpper(type);
-	int typelen = strlen(type);
-	if (strncmp("PROTEIN",type, typelen) == 0) {
-		ps->string = (char *) malloc(MAXAA * sizeof(char));
+/* creates a new sequence and returns the address */
+Seq * Seq_new(char *type) {
+	Seq *newSeq = malloc(sizeof(Seq));
+	
+	newSeq->type = toupper(type[0]);
+	switch(newSeq->type) {
+		case 'P':
+			newSeq->string = (char *) malloc(MAXAA * sizeof(char));
+			break;
+		case 'D':
+		case 'R':
+			newSeq->string = (char *) malloc(MAXNT * sizeof(char));
+			break;
+		default:
+			return false;
 	}
-	else if (strncmp("DNA", type, typelen) == 0 || strncmp("RNA", type, typelen) == 0) {
-		ps->string = (char *) malloc(MAXNT * sizeof(char));
-	}
-	else {
-		return false;
-	}
-
-	ps->id = (char *) malloc(MAXST * sizeof(char));
-	ps->desc = (char *) malloc(MAXST * sizeof(char));
-	ps->type = type[0];
-	ps->size = 0;
-	return true;
+	newSeq->id = (char *) malloc(MAXST * sizeof(char));
+	newSeq->desc = (char *) malloc(MAXST * sizeof(char));
+	newSeq->size = 0;
+	return newSeq;
 }
 
-bool SeqFetch(Seq ps, FILE *fp) {
-	if (fgetc(fp) != '>') {
+/* deletes a sequence from memory */
+void Seq_delete(Seq *ps) {
+	free(ps);
+}
+
+/* fetches sequence data from FASTA file */
+bool Seq_fetch(Seq *ps, FILE *fp) {
+	if (fgetc(fp) != '>') {                                       /* file must be FASTA    */
+		return false;
+	} 
+	if (ps->type != 'D' || ps->type != 'R' || ps->type != 'P') {  /* ps must be created    */
 		return false;
 	}
 	int i;
 	char ch = fgetc(fp);
-	for (i = 0; ch != ' '; i++) {
+	for (i = 0; ch != ' '; i++) {                                 /* fetch id              */
 		ps->id[i] = ch;
 		ch = fgetc(fp);
 	}
 	ch = fgetc(fp);
-	for (i = 0; ch != '\n'; i++) {
+	for (i = 0; ch != '\n'; i++) {                                /* fetch description     */
 		ps->desc[i] = ch;
 		ch = fgetc(fp);
 	}
 	ch = fgetc(fp);
-	for (i = 0; !feof(fp); i++) {
+	for (i = 0; !feof(fp); i++) {                                 /* fetch string          */
 		if (ch == '\n') {
 			ch = fgetc(fp);
 			continue;
@@ -63,43 +78,45 @@ bool SeqFetch(Seq ps, FILE *fp) {
 	return true;
 }
 
-bool SeqTranscribe(Seq dna, Seq rna) {
+/* transcribes DNA sequence into RNA */
+bool Seq_transcribe(Seq *pdna, Seq *prna) {
 	char ch;
 
-	if (dna->type != 'D' || rna->type != 'R') {
+	if (pdna->type != 'D' || prna->type != 'R') {
 		return false;
 	}
-	strcpy(rna->id, dna->id);
-	strcpy(rna->desc, dna->desc);
-	rna->size = dna->size;
-	for (int i = 0; i < dna->size; i++) {
-		ch = dna->string[i];
+	strcpy(prna->id, pdna->id);
+	strcpy(prna->desc, pdna->desc);
+	prna->size = pdna->size;
+	for (int i = 0; i < pdna->size; i++) {
+		ch = pdna->string[i];
 		if (ch == 'T') {
-			rna->string[i] = 'U';
+			prna->string[i] = 'U';
 		}
 		else {
-			rna->string[i] = ch;
+			prna->string[i] = ch;
 		}
 	}
 
 	return true;
 }
 
-bool SeqTranslate(Seq rna, Seq prt) {
+/* translates RNA string into protein (amino acid) string */
+bool Seq_translate(Seq *prna, Seq *pprt) {
 	char codon[3];
 	char ch;
 	double value = 0;
 	double m;
 	int prtct = 0;
 
-	if (rna->type != 'R' || prt->type != 'P') {
+	if (prna->type != 'R' || pprt->type != 'P') {
 		return false;
 	}
-	strcpy(prt->id, rna->id);
-	strcpy(prt->desc, rna->desc);
-	for (int i = 0; i < rna->size; i++) {
+	strcpy(pprt->id, prna->id);
+	strcpy(pprt->desc, prna->desc);
+	for (int i = 0; i < prna->size; i++) {
 		for (int cindex = 0; cindex < 3; cindex++) {
-			codon[i] = rna->string[i + cindex];
+			codon[i] = prna->string[i + cindex];
 		}
 		i += 3;
 		for (int cindex = 0; cindex < 3; cindex++) {
@@ -110,9 +127,9 @@ bool SeqTranslate(Seq rna, Seq prt) {
 				case 'G':	value += 3 * m; break;
 			}
 		}
-		prt->string[prtct++] = CODONTABLE[(int)value];
+		pprt->string[prtct++] = CODONTABLE[(int)value];
 	}
-	prt->size = prtct;
+	pprt->size = prtct;
 	return true;
 }
 
