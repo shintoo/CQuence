@@ -88,9 +88,6 @@ void Seq_write(Seq *ps, FILE *fasta) {
 	fprintf(fasta, ">%s %s\n", ps->id, ps->desc);
 	for (int i = 0; i < ps->size; i++) {
 		fputc(ps->string[i], fasta);
-		if (i & 60 == 0) {
-			fputc('\n', fasta);
-		}
 	}
 	fputc('\n', fasta);
 }
@@ -131,17 +128,17 @@ bool Seq_translate(Seq *prna, Seq *pprt) {
 	}
 	strcpy(pprt->id, prna->id);
 	strcpy(pprt->desc, prna->desc);
-	for (int i = 0; i < prna->size && i < MAXNT; i++) {
+	for (int i = 0; i < prna->size + 1 && i < MAXNT; i++) {
 		for (int cindex = 0; cindex < 3; cindex++) {
 			codon[cindex] = prna->string[i + cindex];
 		}
-		i += 3;
+		i += 2;
 		for (int cindex = 0; cindex < 3; cindex++) {
 			m = pow(4, cindex);
 			switch(codon[2 - cindex]) {
-				case 'C':	value += 1 * m; break;
-				case 'A':	value += 2 * m; break;
-				case 'G':	value += 3 * m; break;
+				case 'C': value += 1 * m; break;
+				case 'A': value += 2 * m; break;
+				case 'G': value += 3 * m; break;
 			}
 		}
 		pprt->string[aact] = CODONTABLE[(int)value];
