@@ -37,4 +37,16 @@ int main(int argc, char **argv) {
 	Seq_delete(protein);
 	return 0;
 }  
+```  
+With an input file of:  
+```
+>sample_id sample description
+TGTCAGAATTGTATTTCAGGCCGAGAAGCCACT  
+```  
+The output file created:  
+```  
+>sample_id sample description  
+UGUCAGAAUUGUAUUUCAGGCCGAGAAGCCACU  
+>sample_id sample description  
+CQNCISGREAT  
 ```
