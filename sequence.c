@@ -73,6 +73,7 @@ bool Seq_fetch(Seq *ps, FILE *fasta) {
 	for (i = 0; !feof(fasta); i++) {                                 /* fetch string          */
 		if (ch == '\n') {
 			ch = fgetc(fasta);
+			i--;
 			continue;
 		}
 		ps->string[i] = ch;
