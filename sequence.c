@@ -78,8 +78,21 @@ bool Seq_fetch(Seq *ps, FILE *fasta) {
 		ps->string[i] = ch;
 		ch = fgetc(fasta);
 	}
-	ps->size = i;
+	ps->size = i - 1;
 	return true;
+}
+
+/* write a sequence to a file */
+void Seq_write(Seq *ps, FILE *fasta) {
+	
+	fprintf(fasta, ">%s %s\n", ps->id, ps->desc);
+	for (int i = 0; i < ps->size; i++) {
+		fputc(ps->string[i], fasta);
+		if (i & 60 == 0) {
+			fputc('\n', fasta);
+		}
+	}
+	fputc('\n', fasta);
 }
 
 /* transcribes DNA sequence into RNA */
@@ -111,6 +124,7 @@ bool Seq_translate(Seq *prna, Seq *pprt) {
 	char ch;
 	double value = 0;
 	double m;
+	int aact = 0;
 
 	if (prna->type != 'R' || pprt->type != 'P') {
 		return false;
@@ -124,15 +138,17 @@ bool Seq_translate(Seq *prna, Seq *pprt) {
 		i += 3;
 		for (int cindex = 0; cindex < 3; cindex++) {
 			m = pow(4, cindex);
-			switch(codon[cindex]) {
+			switch(codon[2 - cindex]) {
 				case 'C':	value += 1 * m; break;
 				case 'A':	value += 2 * m; break;
 				case 'G':	value += 3 * m; break;
 			}
 		}
-		pprt->string[pprt->size++] = CODONTABLE[(int)value];
+		pprt->string[aact] = CODONTABLE[(int)value];
+		aact++;
 		value = 0;
 	}
+	pprt->size = aact - 1;
 	return true;
 }
 

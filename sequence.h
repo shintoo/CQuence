@@ -5,9 +5,9 @@
 #include <stdbool.h>
 
 /* change these values as needed */
-#define MAXNT 300                /* Maximum number of nucleotides       */
+#define MAXNT 400                /* Maximum number of nucleotides       */
 #define MAXAA MAXNT/3            /* Maximum number of amino acids       */
-#define MAXST 100                 /* Maximum size for ID and description */
+#define MAXST 200                 /* Maximum size for ID and description */
 
 /* DO NOT CHANGE ANYTHING BEYOND THIS POINT */
 
@@ -42,9 +42,7 @@ bool Seq_fetch(Seq *ps, FILE *fp);
 /* preconditions:  ps points to a sequence that has been        */
 /*                 fetched, transcribed to, or translated to    */
 /* postconditions: file is written with the sequence            */
-/*                 if the file already exists with data in it,  */
-/*                 it is overwritten                            */
-bool Seq_write(Seq *ps, FILE *fp);
+void Seq_write(Seq *ps, FILE *fp);
 
 /* operation:      Transcribe a sequence of DNA into a sequence */
 /*                 of RNA                                       */
