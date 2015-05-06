@@ -79,7 +79,7 @@ bool Seq_fetch(Seq *ps, FILE *fasta) {
 		ps->string[i] = ch;
 		ch = fgetc(fasta);
 	}
-	ps->size = i - 1;
+	ps->size = i;
 	return true;
 }
 
@@ -89,6 +89,9 @@ void Seq_write(Seq *ps, FILE *fasta) {
 	fprintf(fasta, ">%s %s\n", ps->id, ps->desc);
 	for (int i = 0; i < ps->size; i++) {
 		fputc(ps->string[i], fasta);
+		if ((i + 1) % 60 == 0) {
+			fputc('\n', fasta);
+		}
 	}
 	fputc('\n', fasta);
 }
