@@ -85,13 +85,17 @@ bool Seq_fetch(Seq *ps, FILE *fasta) {
 
 /* write a sequence to a file */
 void Seq_write(Seq *ps, FILE *fasta) {
-	
+	int i;
+
 	fprintf(fasta, ">%s %s\n", ps->id, ps->desc);
-	for (int i = 0; i < ps->size; i++) {
+	for (i = 0; i < ps->size; i++) {
 		fputc(ps->string[i], fasta);
 		if ((i + 1) % 60 == 0) {
 			fputc('\n', fasta);
 		}
+	}
+	if (i % 60 != 0) {
+		fputc('\n', fasta);
 	}
 }
 
