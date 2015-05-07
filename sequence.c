@@ -140,6 +140,9 @@ bool Seq_translate(Seq *pnt, Seq *paa) {
 		strcpy(prna->desc, pnt->desc);
 		Seq_transcribe(pnt, prna);
 	}
+	else {
+		prna = pnt;
+	}
 	strcpy(paa->id, prna->id);
 	strcpy(paa->desc, prna->desc);
 	for (int i = 0; i < prna->size + 1 && i < MAXNT; i++) {
@@ -161,10 +164,4 @@ bool Seq_translate(Seq *pnt, Seq *paa) {
 	}
 	paa->size = aact - 1;
 	return true;
-}
-
-static char * ToUpper(char *str) {
-	while (*str++) {
-		*str = toupper(*str);
-	}
 }
