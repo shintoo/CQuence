@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 /* change these values as needed */
-#define MAXNT 400                /* Maximum number of nucleotides       */
+#define MAXNT 1500                /* Maximum number of nucleotides       */
 #define MAXAA MAXNT/3            /* Maximum number of amino acids       */
 #define MAXST 200                 /* Maximum size for ID and description */
 
@@ -54,14 +54,14 @@ void Seq_write(Seq *ps, FILE *fp);
 bool Seq_transcribe(Seq *pdna, Seq *prna);
 
 
-/* operation:      Translate a sequence of RNA into a protein   */
-/*                 sequence                                     */
-/* preconditions:  prna points to a sequence of type RNA        */
-/*                 pprt points to a sequence of type PROTEIN    */
-/* postconditions: the sequence pointed to by prna is           */
+/* operation:      Translate a sequence of RNA or DNA into a    */
+/*                  protein sequence                            */
+/* preconditions:  pnt points to a sequence of type RNA or DNA  */
+/*                 paa points to a sequence of type PROTEIN     */
+/* postconditions: the sequence pointed to by pnt is            */
 /*                 translated into the sequence pointed to by   */
-/*                 pprt                                         */
+/*                 paa                                          */
 /*                 returns true if successful, otherwise false  */
-bool Seq_translate(Seq *prna, Seq *pprt);
+bool Seq_translate(Seq *pnt, Seq *paa);
 
 #endif
