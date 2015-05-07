@@ -76,7 +76,7 @@ bool Seq_fetch(Seq *ps, FILE *fasta) {
 			i--;
 			continue;
 		}
-		ps->string[i] = ch;
+		ps->string[i] = toupper(ch);
 		ch = fgetc(fasta);
 	}
 	ps->size = i;
@@ -93,7 +93,6 @@ void Seq_write(Seq *ps, FILE *fasta) {
 			fputc('\n', fasta);
 		}
 	}
-	fputc('\n', fasta);
 }
 
 /* transcribes DNA sequence into RNA */
