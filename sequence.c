@@ -123,18 +123,25 @@ bool Seq_transcribe(Seq *pdna, Seq *prna) {
 }
 
 /* translates RNA string into protein (amino acid) string */
-bool Seq_translate(Seq *prna, Seq *pprt) {
+bool Seq_translate(Seq *pnt, Seq *paa) {
 	char codon[3];
 	char ch;
 	double value = 0;
 	double m;
 	int aact = 0;
+	Seq *prna;
 
-	if (prna->type != 'R' || pprt->type != 'P') {
+	if ((pnt->type != 'R' && pnt->type != 'D') || paa->type != 'P') {
 		return false;
 	}
-	strcpy(pprt->id, prna->id);
-	strcpy(pprt->desc, prna->desc);
+	if (pnt->type == 'D') {
+		prna = Seq_new("RNA");
+		strcpy(prna->id, pnt->id);
+		strcpy(prna->desc, pnt->desc);
+		Seq_transcribe(pnt, prna);
+	}
+	strcpy(paa->id, prna->id);
+	strcpy(paa->desc, prna->desc);
 	for (int i = 0; i < prna->size + 1 && i < MAXNT; i++) {
 		for (int cindex = 0; cindex < 3; cindex++) {
 			codon[cindex] = prna->string[i + cindex];
@@ -148,11 +155,11 @@ bool Seq_translate(Seq *prna, Seq *pprt) {
 				case 'G': value += 3 * m; break;
 			}
 		}
-		pprt->string[aact] = CODONTABLE[(int)value];
+		paa->string[aact] = CODONTABLE[(int)value];
 		aact++;
 		value = 0;
 	}
-	pprt->size = aact - 1;
+	paa->size = aact - 1;
 	return true;
 }
 
