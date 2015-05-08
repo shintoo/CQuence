@@ -3,6 +3,64 @@ CQuence is a very simple library for handling biological sequences.
 ### Interface
 CQuence interacts with sequences stored in the FASTA file format.  
 
+```  
+Seq *seq;
+FILE *fin = fopen("infile", "r");
+FILE *fout = fopen("outfile", "w");
+
+/* Read a sequence from a fasta file */
+seq = Seq_read_fasta(fin);
+
+/* Write a sequence to a fasta file */
+Seq_write_fasta(seq, outfile);
+
+/* Create a new sequence from scratch */
+Seq *dna = Seq_new("DNA");
+Seq *rna = Seq_new("RNA");
+Seq *protein = Seq_new("protein");
+
+/* Set a sequence ID */
+Seq_set_id(dna, "dna_ID");
+
+/* Set a sequence description */
+Seq_set_description(seq, "dna description");
+
+/* Set a sequence string */
+Seq_set_string(dna, "ACTGACTG");
+
+/* Get a sequence ID */
+char *id;
+id = Seq_get_id(seq);
+
+/* Get a sequence description */
+char *description;
+description = Seq_get_description(seq);
+
+/* Get a sequence string */
+char *string;
+string = Seq_get_string(seq);
+
+/* Transcribe a sequence */
+rna = Seq_transcribe(dna);
+
+/* Translate a DNA sequence */
+protein = Seq_translate(dna);
+
+/* Translate an RNA sequence */
+protein = Seq_translate(rna);
+
+/* Get the GC content of a DNA or RNA sequence */
+double dna_gc;
+dna gc = Seq_gc(dna);
+
+/* Get the reverse complement of a DNA sequence */
+Seq * dna_revc;
+dna_revc = Seq_complement(dna);  
+
+/* Delete a sequence from memory */
+Seq_delete(seq)
+```  
+
 #### Examples
 ##### Simple demonstration
 ```
