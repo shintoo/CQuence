@@ -12,7 +12,7 @@ FILE *fout = fopen("outfile", "w");
 seq = Seq_read_fasta(fin);
 
 /* Write a sequence to a fasta file */
-Seq_write_fasta(seq, outfile);
+Seq_write_fasta(seq, fout);
 
 /* Create a new sequence from scratch */
 Seq *dna = Seq_new("DNA");
