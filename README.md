@@ -51,7 +51,7 @@ protein = Seq_translate(rna);
 
 /* Get the GC content of a DNA or RNA sequence */
 double dna_gc;
-dna gc = Seq_gc(dna);
+dna_gc = Seq_gc(dna);
 
 /* Get the reverse complement of a DNA sequence */
 Seq * dna_revc;
