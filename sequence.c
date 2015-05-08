@@ -17,7 +17,11 @@ struct sequence {
 
 const char *CODONTABLE = "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG";
 
+/* Local function prototypes */
 static char * ToUpper(char *st);
+static char Resolve_type(Seq *ps);
+
+/*        MANAGEMENT FUNCTIONS        */
 
 /* creates a new sequence and returns the address */
 Seq * Seq_new(char *type) {
@@ -28,6 +32,7 @@ Seq * Seq_new(char *type) {
 		case 'P':
 			newSeq->string = (char *) malloc(MAXAA * sizeof(char));
 			break;
+		case 'U':                                                 /* unknown */
 		case 'D':
 		case 'R':
 			newSeq->string = (char *) malloc(MAXNT * sizeof(char));
@@ -43,17 +48,19 @@ Seq * Seq_new(char *type) {
 
 /* deletes a sequence from memory */
 void Seq_delete(Seq *ps) {
+	free(ps->id);
+	free(ps->desc);
+	free(ps->string);
 	free(ps);
 }
 
+/*        I/O FUNCTIONS        */
+
 /* fetches sequence data from FASTA file */
-bool Seq_fetch(Seq *ps, FILE *fasta) {
-	if (fgetc(fasta) != '>') {                                       /* file must be FASTA    */
-		return false;
-	}
-	if (ps->type != 'D' && ps->type != 'R' && ps->type != 'P') {  /* ps must be created    */
-		return false;
-	}
+Seq *  Seq_read_fasta(FILE *fasta) {
+	Seq *ps = Seq_new("unknown");
+
+
 	int i;
 	char ch = fgetc(fasta);
 	for (i = 0; ch != ' ' && ch != '\n' && i < MAXST - 1; i++) {  /* fetch id              */
@@ -63,7 +70,7 @@ bool Seq_fetch(Seq *ps, FILE *fasta) {
 	ps->id[i] = '\0';
 	if (ch != '\n') {
 		ch = fgetc(fasta);
-		for (i = 0; ch != '\n' && i < MAXST - 1; i++) {  /* fetch id              */
+		for (i = 0; ch != '\n' && i < MAXST - 1; i++) {  /* fetch id */
 			ps->desc[i] = ch;
 			ch = fgetc(fasta);
 		}
@@ -79,12 +86,16 @@ bool Seq_fetch(Seq *ps, FILE *fasta) {
 		ps->string[i] = toupper(ch);
 		ch = fgetc(fasta);
 	}
+	ps->type = Resolve_type(ps);
+	if (ps->type == 'P') {
+		ps->string = realloc(ps->string, MAXAA);
+	}
 	ps->size = i;
-	return true;
+	return ps;
 }
 
 /* write a sequence to a file */
-void Seq_write(Seq *ps, FILE *fasta) {
+void Seq_write_fasta(Seq *ps, FILE *fasta) {
 	int i;
 
 	fprintf(fasta, ">%s %s\n", ps->id, ps->desc);
@@ -99,13 +110,13 @@ void Seq_write(Seq *ps, FILE *fasta) {
 	}
 }
 
-/* transcribes DNA sequence into RNA */
-bool Seq_transcribe(Seq *pdna, Seq *prna) {
-	char ch;
+/*        OPERATION FUNCTIONS        */
 
-	if (pdna->type != 'D' || prna->type != 'R') {
-		return false;
-	}
+/* transcribes DNA sequence into RNA */
+Seq * Seq_transcribe(Seq *pdna) {
+	char ch;
+	
+	Seq *prna = Seq_new("RNA");
 	strcpy(prna->id, pdna->id);
 	strcpy(prna->desc, pdna->desc);
 	prna->size = pdna->size;
@@ -119,17 +130,18 @@ bool Seq_transcribe(Seq *pdna, Seq *prna) {
 		}
 	}
 
-	return true;
+	return prna;
 }
 
 /* translates RNA string into protein (amino acid) string */
-bool Seq_translate(Seq *pnt, Seq *paa) {
+Seq * Seq_translate(Seq *pnt) {
 	char codon[3];
 	char ch;
 	double value = 0;
 	double m;
 	int aact = 0;
 	Seq *prna;
+	Seq *paa = Seq_new("protein");
 
 	if ((pnt->type != 'R' && pnt->type != 'D') || paa->type != 'P') {
 		return false;
@@ -138,7 +150,8 @@ bool Seq_translate(Seq *pnt, Seq *paa) {
 		prna = Seq_new("RNA");
 		strcpy(prna->id, pnt->id);
 		strcpy(prna->desc, pnt->desc);
-		Seq_transcribe(pnt, prna);
+		prna = Seq_transcribe(pnt);
+		
 	}
 	else {
 		prna = pnt;
@@ -163,5 +176,107 @@ bool Seq_translate(Seq *pnt, Seq *paa) {
 		value = 0;
 	}
 	paa->size = aact - 1;
-	return true;
+	return paa;
+}
+
+/* reverse complements a DNA sequence */
+Seq * Seq_complement(Seq *pdna) {
+	Seq *pcomp =  Seq_new("DNA");
+	
+	pcomp->size = pdna->size;
+	strcpy(pcomp->id, pdna->id);
+	strcpy(pcomp->desc, pdna->desc);
+
+	for (int i = pdna->size - 1; i >= 0; i--) {
+		switch (pdna->string[i]) {
+			case 'A': pcomp->string[pdna->size - i - 1] = 'T'; break;
+			case 'T': pcomp->string[pdna->size - i - 1] = 'A'; break;
+			case 'G': pcomp->string[pdna->size - i - 1] = 'C'; break;
+			case 'C': pcomp->string[pdna->size - i - 1] = 'G'; break;
+		}
+	}
+	
+	return pcomp;
+}
+
+/*        INFORMATION FUNCTIONS        */
+
+/* get the GC content percentage of a DNA or RNA sequence */
+double Seq_gc(Seq *ps) {
+	double gc = 0;
+	
+	if (ps->type == 'P') {
+		return -1;
+	}
+	for (int i = 0; i < ps->size; i++) {
+		if (ps->string[i] == 'C' || ps->string[i] == 'G') {
+			gc++;
+		}
+	}
+
+	return gc;
+}
+
+/*        GET FUNCTIONS        */
+
+/* get the id of a sequnce */
+char * Seq_get_id(Seq *ps) {
+	return ps->id;
+}
+
+/* get the description of a sequence */
+char * Seq_get_description(Seq *ps) {
+	return ps->desc;
+}
+
+/* get the string of a sequence */
+char * Seq_get_string(Seq *ps) {
+	return ps->string;
+}
+
+/* SET FUNCTIONS */
+
+/* set the id of a sequence to a string */
+void Seq_set_id(Seq *ps, char *id) {
+	strncpy(ps->id, id, MAXST);
+}
+
+/* set the description of a sequence to a string */
+void Seq_set_description(Seq *ps, char *desc) {
+	strncpy(ps->desc, desc, MAXST);
+}
+
+/* set the AA/base string of a sequence to a string */
+void Seq_set_string(Seq *ps, char *string) {
+	string = ToUpper(string);
+	ps->size = strlen(string);
+	strncpy(ps->string, string, MAXST);
+
+}
+
+
+/*        LOCAL FUNCTIONS        */
+static char * ToUpper(char *str) {
+	int length = strlen(str);
+	char *new =  (char *) malloc(sizeof(char) * strlen(str));
+
+	for (int i = 0; i < length; i++) {
+		new[i] = toupper(str[i]);
+	}
+	
+	return new;
+}
+
+static char Resolve_type(Seq *ps) {
+	bool dna, rna, prt;
+
+	for (int i = 0; i < ps->size; i++) {
+		if (ps->string[i] == 'U') {
+			return 'R';
+		}
+		if (strchr("acgt", ps->string[i]) == NULL) {
+			return 'P';
+		}
+	}
+	return 'D';
 }
