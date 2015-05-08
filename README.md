@@ -7,7 +7,7 @@ CQuence interacts with sequences stored in the FASTA file format.
 ##### Simple demonstration
 ```
 #include <stdio.h>
-#include "../sequence.h"
+#include "sequence.h"
 
 int main(int argc, char **argv) {
 	FILE *infasta = fopen(argv[1], "r");
