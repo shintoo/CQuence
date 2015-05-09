@@ -271,7 +271,7 @@ static char Resolve_type(Seq *ps) {
 		if (ps->string[i] == 'U') {
 			return 'R';
 		}
-		if (strchr("acgt", ps->string[i]) == NULL) {
+		if (strchr("ACGT", ps->string[i]) == NULL) {
 			return 'P';
 		}
 	}
