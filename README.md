@@ -1,8 +1,19 @@
 # CQuence
 CQuence is a very simple library for handling biological sequences.
-### Interface
+
+##Installation  
+Clone the repository and install:  
+```
+git clone https://github.com/shintoo/CQuence.git
+sudo make
+sudo make install
+```
+
+
+## Interface
 CQuence interacts with sequences stored in the FASTA file format.  
 
+### Function examples
 ```  
 #include <cquence.h>
 
@@ -63,8 +74,7 @@ dna_revc = Seq_complement(dna);
 Seq_delete(seq)
 ```  
 
-#### Examples
-##### Simple demonstration
+### Example Program
 ```
 #include <stdio.h>
 #include <cquence.h>
