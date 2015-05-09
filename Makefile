@@ -1,5 +1,6 @@
 CC=gcc
-CFLAGS = -c -Wall -std=c11 -lm
+CFLAGS = -c -Wall -std=c11
+LIBFLAGS = -lm
 LIBDIR= /usr/lib
 INCLUDE= /usr/include
 
@@ -12,7 +13,7 @@ libcquence.a: cquence.o
 	ar -cvq libcquence.a cquence.o
 
 cquence.o: header
-	$(CC) $(CFLAGS) cquence.c -o cquence.o 
+	$(CC) $(CFLAGS) cquence.c -o cquence.o $(LIBFLAGS)
 
 header:
 	cp cquence.h $(INCLUDE)
