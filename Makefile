@@ -19,4 +19,4 @@ header:
 
 clean:
 	rm *.o
-	rm *.o
+	rm *.a
