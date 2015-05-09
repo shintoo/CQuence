@@ -9,7 +9,7 @@ cd CQuence
 sudo make
 sudo make install
 ```
-Link the library to your programs with `-lcquence` at compile time.
+Link the library to your programs with `-lcquence -lm` at compile time.
 
 ## Interface
 CQuence interacts with sequences stored in the FASTA file format.  
