@@ -4,6 +4,8 @@ CQuence is a very simple library for handling biological sequences.
 CQuence interacts with sequences stored in the FASTA file format.  
 
 ```  
+#include <cquence.h>
+
 Seq *seq;
 FILE *fin = fopen("infile", "r");
 FILE *fout = fopen("outfile", "w");
@@ -65,7 +67,7 @@ Seq_delete(seq)
 ##### Simple demonstration
 ```
 #include <stdio.h>
-#include "sequence.h"
+#include <cquence.h>
 
 int main(int argc, char **argv) {
 	FILE *infasta = fopen(argv[1], "r");

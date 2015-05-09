@@ -1,6 +1,6 @@
 /* sequence.h -- sequence ADT interface header file */
-#ifndef _SEQUENCE_H_
-#define _SEQUENCE_H_
+#ifndef _CQUENCE_H_
+#define _CQUENCE_H_
 
 #include <stdbool.h>
 

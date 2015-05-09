@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sequence.h"
+#include "cquence.h"
 
 struct sequence {
 	char *id;
@@ -62,6 +62,7 @@ Seq *  Seq_read_fasta(FILE *fasta) {
 
 
 	int i;
+	fgetc(fasta);                                                 /* skip over '>'         */
 	char ch = fgetc(fasta);
 	for (i = 0; ch != ' ' && ch != '\n' && i < MAXST - 1; i++) {  /* fetch id              */
 		ps->id[i] = ch;
@@ -70,14 +71,14 @@ Seq *  Seq_read_fasta(FILE *fasta) {
 	ps->id[i] = '\0';
 	if (ch != '\n') {
 		ch = fgetc(fasta);
-		for (i = 0; ch != '\n' && i < MAXST - 1; i++) {  /* fetch id */
+		for (i = 0; ch != '\n' && i < MAXST - 1; i++) {           /* fetch id              */
 			ps->desc[i] = ch;
 			ch = fgetc(fasta);
 		}
 		ps->desc[i] = '\0';
 	}
 	ch = fgetc(fasta);
-	for (i = 0; !feof(fasta); i++) {                                 /* fetch string          */
+	for (i = 0; !feof(fasta); i++) {                              /* fetch string          */
 		if (ch == '\n') {
 			ch = fgetc(fasta);
 			i--;
@@ -136,16 +137,12 @@ Seq * Seq_transcribe(Seq *pdna) {
 /* translates RNA string into protein (amino acid) string */
 Seq * Seq_translate(Seq *pnt) {
 	char codon[3];
-	char ch;
 	double value = 0;
 	double m;
 	int aact = 0;
 	Seq *prna;
 	Seq *paa = Seq_new("protein");
 
-	if ((pnt->type != 'R' && pnt->type != 'D') || paa->type != 'P') {
-		return false;
-	}
 	if (pnt->type == 'D') {
 		prna = Seq_new("RNA");
 		strcpy(prna->id, pnt->id);
@@ -176,6 +173,7 @@ Seq * Seq_translate(Seq *pnt) {
 		value = 0;
 	}
 	paa->size = aact - 1;
+
 	return paa;
 }
 
@@ -213,6 +211,7 @@ double Seq_gc(Seq *ps) {
 			gc++;
 		}
 	}
+	gc = gc / (double) ps->size;
 
 	return gc;
 }
@@ -268,8 +267,6 @@ static char * ToUpper(char *str) {
 }
 
 static char Resolve_type(Seq *ps) {
-	bool dna, rna, prt;
-
 	for (int i = 0; i < ps->size; i++) {
 		if (ps->string[i] == 'U') {
 			return 'R';
