@@ -5,6 +5,7 @@ CQuence is a very simple library for handling biological sequences.
 Clone the repository and install:  
 ```
 git clone https://github.com/shintoo/CQuence.git
+cd CQuence
 sudo make
 sudo make install
 ```
