@@ -6,9 +6,15 @@ Clone the repository and install:
 ```
 git clone https://github.com/shintoo/CQuence.git
 cd CQuence
-sudo make
+ make
 sudo make install
 ```
+###Uninstall
+```
+sudo make uninstall
+```
+To update from a previois version, uninstall, clone, and reinstall.
+
 Link the library to your programs with `-lcquence -lm` at compile time.
 
 ## Interface
@@ -16,7 +22,7 @@ CQuence interacts with sequences stored in the FASTA file format.
 
 ### Function examples
 ```  
-#include <cquence.h>
+#include <cq/cq.h>
 
 Seq *seq;
 FILE *fin = fopen("infile", "r");
@@ -78,7 +84,7 @@ Seq_delete(seq)
 ### Example Program
 ```
 #include <stdio.h>
-#include <cquence.h>
+#include <cq/cq.h>
 
 int main(int argc, char **argv) {
 	FILE *infasta = fopen(argv[1], "r");
