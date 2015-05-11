@@ -6,14 +6,15 @@ Clone the repository and install:
 ```
 git clone https://github.com/shintoo/CQuence.git
 cd CQuence
- make
+make
 sudo make install
 ```
 ###Uninstall
 ```
 sudo make uninstall
-```
-To update from a previois version, uninstall, clone, and reinstall.
+```  
+
+To update from a previous version, uninstall, clone, and reinstall.
 
 Link the library to your programs with `-lcquence -lm` at compile time.
 
