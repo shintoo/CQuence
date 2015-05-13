@@ -29,3 +29,15 @@ char Resolve_type(Seq *ps) {
 	}
 	return 'D';
 }
+
+double dpow(double x, double y) {
+	if (x == 0) return 0;
+	if (y == 0) return 1;
+
+	double res = 1;
+	for (int i = 1; i <= y; i++) {
+		res = res * x;
+	}
+
+	return res;
+}

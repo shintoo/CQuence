@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <math.h>
 #include <ctype.h>
 
 #include "NA.h"
@@ -59,7 +58,7 @@ Seq * Seq_translate(Seq *pnt) {
 		}
 		i += 2;
 		for (int cindex = 0; cindex < 3; cindex++) {
-			m = pow(4, cindex);
+			m = dpow(4, cindex);
 			switch(codon[2 - cindex]) {
 				case 'C': value += 1 * m; break;
 				case 'A': value += 2 * m; break;

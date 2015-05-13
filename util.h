@@ -6,6 +6,7 @@
 #define MAXAA MAXNT/3             /* Maximum number of amino acids       */
 #define MAXST 200                 /* Maximum size for ID and description */
 
+
 struct sequence {
 	char *id;
 	char *desc;
@@ -19,5 +20,5 @@ typedef struct sequence Seq;
 /* utility function prototypes */
 char * ToUpper(char *st);
 char Resolve_type(Seq *ps);
-
+double dpow(double x, double y);
 #endif

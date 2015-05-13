@@ -16,7 +16,7 @@ sudo make uninstall
 
 To update from a previous version, uninstall, clone, and reinstall.
 
-Link the library to your programs with `-lcquence -lm` at compile time.
+Link the library to your programs with `-lcq` at compile time.
 
 ## Interface
 CQuence interacts with sequences stored in the FASTA file format.  
