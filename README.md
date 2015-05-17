@@ -22,7 +22,7 @@ Link the library to your programs with `-lcq` at compile time.
 CQuence interacts with sequences stored in the FASTA file format.  
 
 ### Function examples
-```  
+```C
 #include <cq/cq.h>
 
 Seq *seq;
@@ -80,10 +80,10 @@ dna_revc = Seq_complement(dna);
 
 /* Delete a sequence from memory */
 Seq_delete(seq)
-```  
+```
 
 ### Example Program
-```
+```C
 #include <stdio.h>
 #include <cq/cq.h>
 
